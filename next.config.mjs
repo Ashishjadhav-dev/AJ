@@ -6,9 +6,15 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  images: {
-    unoptimized: true,
+  async redirects() {
+    return [
+      {
+        source: "/Ashish_Jadhav_Full_Stack.pdf",
+        destination: "/documents/ashish-jadhav-resume.pdf",
+        permanent: true,
+      },
+    ];
   },
-}
+};
 
-export default nextConfig
+export default nextConfig;

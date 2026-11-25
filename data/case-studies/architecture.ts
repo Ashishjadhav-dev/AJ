@@ -14,7 +14,6 @@ export const emailEditor: CaseStudy = {
   category: "Frontend Architecture",
   filter: "architecture",
   technologies: ["GrapesJS", "Monaco", "HTML email", "AMP for Email"],
-  minutes: 5,
   featured: "home",
   order: 2,
   contributions: [
@@ -82,6 +81,14 @@ export const emailEditor: CaseStudy = {
     {
       id: "implementation",
       title: "Blocks, forms and lifecycle management",
+      example: {
+        label: "Illustrative representations of one RSVP block",
+        code: [
+          'Editor state   { block: "rsvp", field: "attending", required: true }',
+          "Canvas preview RSVP form with an editable field and a preview-only submit button",
+          "Delivery       AMP form variant and an HTML fallback with a hosted RSVP link",
+        ].join("\n"),
+      },
       paragraphs: [
         "Reusable blocks expose configuration for custom fields and merge tags, media-library assets, and Shopify products. Form controls retain field configuration so preview behavior and delivery serialization can use the same underlying values.",
         "Undo and redo operate on authoring operations. Source changes need a clear import boundary so partial edits or generated output do not pollute history. The editor lifecycle also needs cleanup for listeners and instances when a template changes or the route unmounts.",
@@ -130,7 +137,6 @@ export const automation: CaseStudy = {
   category: "Frontend System Design",
   filter: "architecture",
   technologies: ["XYFlow", "Dagre", "Redux Toolkit", "TypeScript"],
-  minutes: 5,
   order: 3,
   contributions: [
     "My contributions included configurable automation nodes and dynamic forms within the shared workflow builder. The graph, renderer registry and trigger inventory describe the application’s shared implementation.",

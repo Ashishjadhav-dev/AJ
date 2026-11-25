@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
 export type ReadingSection = { id: string; title: string };
-const offset = 122;
 
 export function ReadingProgress({ value }: { value: number }) {
   return (
@@ -70,11 +69,18 @@ export function CaseStudyReading({
   useEffect(() => {
     const content = article.current;
     if (!content) return;
-    const headings = sections.map(({ id }) => document.getElementById(id));
+    const headings = sections.flatMap(({ id }) => {
+      const section = document.getElementById(id);
+      return section ? [section] : [];
+    });
+    const anchor = headings[0];
     let frame = 0;
     const measure = () => {
       frame = 0;
       const { top, bottom } = content.getBoundingClientRect();
+      const offset = anchor
+        ? parseFloat(getComputedStyle(anchor).scrollMarginTop) || 94
+        : 94;
       const range = Math.max(1, bottom - top - innerHeight + offset);
       const completion = Math.round(
         Math.min(1, Math.max(0, (offset - top) / range)) * 100,
@@ -82,8 +88,7 @@ export function CaseStudyReading({
       setProgress(completion);
       let current = sections[0]?.id ?? "";
       for (const heading of headings) {
-        if (!heading || heading.getBoundingClientRect().top > offset + 12)
-          break;
+        if (heading.getBoundingClientRect().top > offset + 12) break;
         current = heading.id;
       }
       setActive(current);

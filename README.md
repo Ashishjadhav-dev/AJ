@@ -1,60 +1,19 @@
-# Ashish’s portfolio
+# Ashish’s engineering portfolio
 
-A responsive Next.js portfolio with a terminal/editor visual style, TypeScript and Framer Motion.
+A Next.js portfolio for Ashish S. Jadhav, Frontend Software Engineer. It uses server-rendered content and small interactive components for theme controls, navigation, contact drafts and case-study demos.
 
-## Development
+## Run locally
 
 Use Node.js 22 or newer.
 
 ```sh
 pnpm install --frozen-lockfile
-pnpm dev
-```
-
-Visit http://localhost:3000. For a production check:
-
-```sh
-npm run lint
-npm run typecheck
-npm run build
-npm start
-```
-
-Browser checks (Google Chrome must be installed):
-
-```sh
-npm run build
-npm run test:e2e
-```
-
-Use `npm run format:check` to check formatting. The PostCSS override applies a compatible patched 8.x release to Next.js’s CSS pipeline.
-
-## Content
-
-Edit `data/portfolio.ts` to update:
-
-- `profile`: name, role, email, social URLs, optional resume URL, availability and career start date.
-- `projects`: cards and generated `/projects/[slug]` pages. Optional `liveUrl` and `sourceUrl` fields expose external links when supplied. Keep slugs unique and URL-safe.
-- `experience`, `skillGroups`, `stats`, `about` and `heroWords`: portfolio content. Experience years are calculated from the career start date.
-- `articles`: title, summary and optional published `url`. Entries without URLs display “Planned article”.
-
-Content is maintained in the repo and takes effect after rebuilding/deploying. There is no CMS or database. The existing project descriptions and career claims were retained; verify those and the impact statistics before publishing. Live project links and published article links are still to be supplied. The resume link uses the PDF in `public/`.
-
-## Engineering case studies
-
-Start a local preview with the release flag enabled.
-
-```sh
 ENGINEERING_CASE_STUDIES_PUBLIC=true pnpm dev
 ```
 
-Open `http://localhost:3000/case-studies`. Search and category filters can be shared using the URL, for example `/case-studies?category=performance&q=Papa%20Parse`.
+Open http://localhost:3000. The case-study flag is opt-in at build time. It controls public article pages, featured content, detailed role contributions, navigation, PDF delivery and sitemap entries. Set it on a public deployment after confirming release approval for the content and assets. Set `PORTFOLIO_SITE_URL` when changing the canonical domain.
 
-The collection, article pages, sharing image, downloads, homepage links, and sitemap entries are disabled by default. Review and approve all employer-related content before setting `ENGINEERING_CASE_STUDIES_PUBLIC=true` for a public build. Set `PORTFOLIO_SITE_URL` at build time if deploying to a domain other than `https://aj-rho.vercel.app`.
-
-Case studies live in `data/case-studies/`. Document the scope of new measurements and use synthetic fixtures. To enable the complete portfolio download, put the approved PDF at `documents/engineering-portfolio.pdf` before building. This location lets the download route enforce the same release flag. Case-specific PDF URLs are optional and should point only to approved files. The existing resume PDF is supplied as an export. Its authoring source is needed to update the link inside the document.
-
-Run the production and browser checks with Google Chrome installed.
+## Checks
 
 ```sh
 pnpm typecheck
@@ -63,27 +22,18 @@ ENGINEERING_CASE_STUDIES_PUBLIC=true pnpm build
 ENGINEERING_CASE_STUDIES_PUBLIC=true pnpm test:e2e
 ```
 
-## Interactions
+The Playwright suite uses Google Chrome and a local production server on port 3100. Run a second build and the release-gate tests without the flag to verify the private default.
 
-- Filter projects by technology and browse their detail pages.
-- Select projects and sections in the project explorer.
-- Open quick navigation with Cmd/Ctrl+K and search by section name.
-- Use the footer terminal (`help` lists commands).
-- Theme preferences persist in local storage. On first visit the site follows the system theme.
-- Native modal dialogs support Escape, focus containment and focus restoration.
-- Reduced-motion preferences stop the rotating headline and floating badges.
+## Content and downloads
 
-## Contact
+- `data/portfolio.ts` holds the public profile, resume-aligned career history, skills, education, credentials and writing.
+- `data/projects.ts` documents verified independent projects and their links. Project pages are generated from this collection.
+- `data/case-studies/` contains technical articles, diagrams, benchmark evidence, methodology, scope and optional downloads. Reading estimates use the published article text at 200 words per minute.
+- The resume is the supplied `Ashish_Jadhav_SDE.pdf`, served byte-for-byte from `public/documents/ashish-jadhav-resume.pdf`. The former PDF URL redirects to this file. The online resume links to the collection when the release flag is enabled.
+- Add an approved engineering portfolio PDF at `documents/engineering-portfolio.pdf` before building. The server exposes it only through the gated route. The existing PDF actions describe availability when the file is absent.
 
-The form validates required fields and opens an encoded `mailto:` draft addressed to Ashish. The visitor must send it from their email app; the website does not claim delivery or store messages. The direct email link remains available if no mail handler is installed. Server-side delivery would require choosing and configuring an email provider.
+The website uses the verified assessment claims for public copy. The supplied resume export preserves its original claims. The editable source for this specific export is needed to revise its claims and embed an Engineering Case Studies hyperlink.
 
-## Structure
+## Interaction details
 
-- `app/`: homepage, project routes, metadata, not-found page and styles.
-- `components/Portfolio.tsx` and `components/PortfolioNavigation.tsx`: homepage composition and shared navigation.
-- `components/Projects.tsx`, `Contact.tsx`, `Footer.tsx`: project explorer, email form and terminal.
-- `components/Providers.tsx`: shared theme and motion preferences.
-- `components/Dialog.tsx`: native accessible modal wrapper.
-- `data/portfolio.ts`: shared typed content.
-
-Unknown project slugs return the custom 404 page. Project titles and descriptions are included in route metadata. No external fonts, image services or API credentials are required.
+The shared header includes desktop and mobile navigation, a theme switcher and command palette. Use Cmd/Ctrl+K to search destinations. The contact form validates inputs and creates a draft in the visitor’s email app. Visitors can also email directly.

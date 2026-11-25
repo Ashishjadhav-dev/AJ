@@ -1,5 +1,10 @@
 import Link from "next/link";
-import { caseStudies, getCaseStudy, toCard } from "@/data/case-studies";
+import {
+  caseStudies,
+  getCaseStudy,
+  readingMinutes,
+  toCard,
+} from "@/data/case-studies";
 import type { CaseStudy } from "@/data/case-studies/schema";
 import { CaseStudyGrid, TechnologyTags } from "./CaseStudyCard";
 import {
@@ -83,7 +88,7 @@ export function CaseStudyArticle({ study }: { study: CaseStudy }) {
         <p className="cs-eyebrow">
           {study.category}
           <span aria-hidden> · </span>
-          <span className="cs-meta">{study.minutes} min read</span>
+          <span className="cs-meta">{readingMinutes(study)} min read</span>
         </p>
         <h1>{study.title}</h1>
         <p className="cs-subtitle">{study.subtitle}</p>

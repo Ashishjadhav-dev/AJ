@@ -12,6 +12,11 @@ export type Category = keyof typeof categories;
 
 export type Metric = {
   value: string;
+  unit: string;
+  method: string;
+  verification:
+    "local-benchmark" | "repository-inventory" | "documented" | "resume";
+  release: "case-studies" | "public";
   label: string;
   scope: string;
   context: string;
@@ -55,7 +60,6 @@ export type CaseStudy = {
   category: string;
   filter: Category;
   technologies: string[];
-  minutes: number;
   featured?: "primary" | "home";
   order: number;
   contributions: string[];

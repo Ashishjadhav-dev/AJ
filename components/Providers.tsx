@@ -1,49 +1,52 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react";
-import { MotionConfig } from "framer-motion";
+import { createContext, useContext, useEffect, type ReactNode } from "react";
 
 type Theme = "dark" | "light";
-const ThemeContext = createContext<{
-  theme: Theme;
-  changeTheme: (value: Theme) => void;
-}>({ theme: "dark", changeTheme: () => {} });
+
+function applyTheme(theme: Theme) {
+  document.documentElement.dataset.theme = theme;
+}
+
+function changeTheme(theme: Theme) {
+  applyTheme(theme);
+  try {
+    localStorage.setItem("portfolio-theme", theme);
+  } catch {
+    // The current page still reflects the selected theme.
+  }
+}
+
+const ThemeContext = createContext({ changeTheme });
 
 export function Providers({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("dark");
   useEffect(() => {
-    let initial: Theme = window.matchMedia("(prefers-color-scheme: light)")
-      .matches
-      ? "light"
-      : "dark";
-    try {
-      const saved = localStorage.getItem("portfolio-theme");
-      if (saved === "light" || saved === "dark") initial = saved;
-    } catch {
-      /* The system preference is used when storage is unavailable. */
-    }
-    setTheme(initial);
+    const preference = window.matchMedia("(prefers-color-scheme: dark)");
+    const update = () => {
+      let saved = null;
+      try {
+        saved = localStorage.getItem("portfolio-theme");
+      } catch {}
+      applyTheme(
+        saved === "light" || saved === "dark"
+          ? saved
+          : preference.matches
+            ? "dark"
+            : "light",
+      );
+    };
+    update();
+    preference.addEventListener("change", update);
+    window.addEventListener("storage", update);
+    return () => {
+      preference.removeEventListener("change", update);
+      window.removeEventListener("storage", update);
+    };
   }, []);
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-  }, [theme]);
-  const changeTheme = (value: Theme) => {
-    setTheme(value);
-    try {
-      localStorage.setItem("portfolio-theme", value);
-    } catch {
-      /* The current theme still works. */
-    }
-  };
+
   return (
-    <ThemeContext.Provider value={{ theme, changeTheme }}>
-      <MotionConfig reducedMotion="user">{children}</MotionConfig>
+    <ThemeContext.Provider value={{ changeTheme }}>
+      {children}
     </ThemeContext.Provider>
   );
 }

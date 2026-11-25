@@ -1,23 +1,48 @@
-import type { Metadata } from "next";
-
 import { profile } from "@/data/portfolio";
 import { Providers } from "@/components/Providers";
-import "../styles/globals.css";
+import { PortfolioNavigation } from "@/components/PortfolioNavigation";
+import { Footer } from "@/components/Footer";
+import { siteMetadata } from "@/lib/site-seo";
+import { caseStudiesEnabled } from "@/lib/case-study-release";
+import { getPortfolioPdf } from "@/lib/engineering-portfolio-pdf";
 import "./globals.css";
 
-export const metadata: Metadata = {
-  title: `${profile.name} — ${profile.role}`,
-  description:
-    "Frontend Engineer building scalable SaaS, workflow systems, real-time applications and high-performance interfaces.",
-};
+export const metadata = siteMetadata(
+  `${profile.name} — ${profile.role}`,
+  profile.summary,
+  "/",
+);
 
-export default function RootLayout({
+const themeScript = `(() => {
+  let theme;
+  try { theme = localStorage.getItem("portfolio-theme"); } catch {}
+  document.documentElement.dataset.theme = theme === "light" || theme === "dark"
+    ? theme : matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+})();`;
+
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const engineeringPdf = caseStudiesEnabled
+    ? await getPortfolioPdf()
+    : undefined;
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          <PortfolioNavigation
+            caseStudies={caseStudiesEnabled}
+            resume={profile.resume}
+          />
+          {children}
+          <Footer
+            caseStudies={caseStudiesEnabled}
+            engineeringPdf={engineeringPdf?.href}
+          />
+        </Providers>
       </body>
     </html>
   );
