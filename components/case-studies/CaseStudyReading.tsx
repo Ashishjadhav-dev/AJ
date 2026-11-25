@@ -73,14 +73,14 @@ export function CaseStudyReading({
       const section = document.getElementById(id);
       return section ? [section] : [];
     });
-    const anchor = headings[0];
     let frame = 0;
     const measure = () => {
       frame = 0;
       const { top, bottom } = content.getBoundingClientRect();
-      const offset = anchor
-        ? parseFloat(getComputedStyle(anchor).scrollMarginTop) || 94
-        : 94;
+      const offset =
+        parseFloat(
+          getComputedStyle(document.documentElement).scrollPaddingBlockStart,
+        ) || 0;
       const range = Math.max(1, bottom - top - innerHeight + offset);
       const completion = Math.round(
         Math.min(1, Math.max(0, (offset - top) / range)) * 100,

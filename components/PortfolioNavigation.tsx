@@ -24,7 +24,7 @@ export function PortfolioNavigation({
   resume: string;
 }) {
   const pathname = usePathname();
-  const { changeTheme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
   const [query, setQuery] = useState("");
   const [activeSection, setActiveSection] = useState("home");
   const [open, setOpen] = useState<"menu" | "palette" | null>(null);
@@ -142,14 +142,9 @@ export function PortfolioNavigation({
             <button
               className="icon-btn"
               type="button"
-              onClick={() =>
-                changeTheme(
-                  document.documentElement.dataset.theme === "light"
-                    ? "dark"
-                    : "light",
-                )
-              }
-              aria-label="Toggle theme"
+              onClick={toggleTheme}
+              aria-label="Dark theme"
+              aria-pressed={theme === undefined ? undefined : theme === "dark"}
             >
               <Sun className="theme-icon-sun" size={17} aria-hidden />
               <Moon className="theme-icon-moon" size={17} aria-hidden />

@@ -65,7 +65,7 @@ export function CaseStudyFilters({ studies }: { studies: CardContent[] }) {
 
   return (
     <>
-      <div className="cs-filter">
+      <div className="cs-filter" role="search" aria-label="Filter case studies">
         <div className="cs-search-line">
           <label className="cs-search">
             <Search size={18} aria-hidden />
@@ -74,6 +74,7 @@ export function CaseStudyFilters({ studies }: { studies: CardContent[] }) {
               ref={search}
               maxLength={100}
               type="search"
+              aria-controls="case-study-results"
               placeholder="Search case studies…"
               value={filters.query}
               onChange={(event) =>
@@ -98,6 +99,7 @@ export function CaseStudyFilters({ studies }: { studies: CardContent[] }) {
           <button
             type="button"
             aria-pressed={!filters.category}
+            aria-controls="case-study-results"
             onClick={() => update({ ...filters, category: "" })}
           >
             All
@@ -108,6 +110,7 @@ export function CaseStudyFilters({ studies }: { studies: CardContent[] }) {
                 type="button"
                 key={category}
                 aria-pressed={filters.category === category}
+                aria-controls="case-study-results"
                 onClick={() => update({ ...filters, category })}
               >
                 {label}
@@ -118,20 +121,26 @@ export function CaseStudyFilters({ studies }: { studies: CardContent[] }) {
       </div>
       <p className="cs-result-count" role="status" aria-atomic="true">
         {matches.length} {matches.length === 1 ? "case study" : "case studies"}
+        <span className="sr-only">
+          {filters.category && ` in ${categories[filters.category]}`}
+          {filters.query.trim() && ` matching “${filters.query.trim()}”`}
+        </span>
       </p>
-      {matches.length ? (
-        <CaseStudyGrid studies={matches} />
-      ) : (
-        <div className="cs-empty">
-          <h3>No matching case studies</h3>
-          <p>
-            Try a different title or technology, or choose another category.
-          </p>
-          <button className="cs-button" type="button" onClick={clear}>
-            Show all case studies
-          </button>
-        </div>
-      )}
+      <div id="case-study-results">
+        {matches.length ? (
+          <CaseStudyGrid studies={matches} />
+        ) : (
+          <div className="cs-empty">
+            <h3>No matching case studies</h3>
+            <p>
+              Try a different title or technology, or choose another category.
+            </p>
+            <button className="cs-button" type="button" onClick={clear}>
+              Show all case studies
+            </button>
+          </div>
+        )}
+      </div>
     </>
   );
 }

@@ -307,7 +307,6 @@
 
 .cs-collection {
   margin-top: clamp(35px, 5.4vw, 64px);
-  scroll-margin-top: var(--cs-nav-offset);
 }
 
 .cs-filter {
@@ -572,9 +571,6 @@
   background: var(--cs-accent);
 }
 
-.cs-reading-body [id] {
-  scroll-margin-top: var(--cs-nav-offset);
-}
 .cs-outcomes {
   padding: 20px clamp(16px, 3vw, 27px);
   border: 1px solid var(--cs-border);
@@ -854,24 +850,6 @@
   border: 1px solid var(--cs-border);
   border-radius: 6px;
 }
-.cs-demo select {
-  appearance: none;
-  padding-right: 25px;
-  background-image:
-    linear-gradient(45deg, transparent 50%, var(--muted) 51%),
-    linear-gradient(135deg, var(--muted) 50%, transparent 51%);
-  background-position:
-    right 13px center,
-    right 8px center;
-  background-size: 5px 5px;
-  background-repeat: no-repeat;
-}
-.cs-demo :is(select, input, textarea) {
-  color-scheme: dark;
-}
-html[data-theme="light"] .cs-demo :is(select, input, textarea) {
-  color-scheme: light;
-}
 .cs-demo .cs-demo-check {
   grid-auto-flow: column;
   align-items: center;
@@ -1039,5 +1017,34 @@ html[data-theme="light"] .cs-demo :is(select, input, textarea) {
   .cs-download {
     align-items: start;
     flex-direction: column;
+  }
+}
+
+@media (forced-colors: active) {
+  .cs :focus-visible,
+  .cs-search:focus-within,
+  .cs-card-link:focus-visible::after {
+    outline-color: Highlight;
+  }
+
+  .cs-filter-categories button[aria-pressed="true"],
+  .cs-button[aria-pressed="true"],
+  .cs-toc a[aria-current] {
+    border: 1px solid Highlight;
+  }
+
+  .cs-button:not(:disabled),
+  .cs-search {
+    border-color: ButtonText;
+  }
+
+  .cs-bar-track span,
+  .cs-chart-row:last-child .cs-bar-track span {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+
+  .cs-chart-row:last-child .cs-bar-track span {
+    background: Highlight;
   }
 }

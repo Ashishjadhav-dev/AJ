@@ -4,7 +4,7 @@ A Next.js portfolio for Ashish S. Jadhav, Frontend Software Engineer. It uses se
 
 ## Run locally
 
-Use Node.js 22 or newer.
+Use Node.js 22 or newer and the pnpm version pinned in `package.json`.
 
 ```sh
 pnpm install --frozen-lockfile
@@ -22,7 +22,9 @@ ENGINEERING_CASE_STUDIES_PUBLIC=true pnpm build
 ENGINEERING_CASE_STUDIES_PUBLIC=true pnpm test:e2e
 ```
 
-The Playwright suite uses Google Chrome and a local production server on port 3100. Run a second build and the release-gate tests without the flag to verify the private default.
+Production builds enforce TypeScript and ESLint. ESLint also fails on warnings.
+
+The Playwright suite uses Google Chrome and a local production server on port 3100. It runs axe on every enabled page in both themes and covers the Chromium accessibility tree, keyboard shortcuts, forced colors, and focus restoration. Run a second build and the release-gate tests without the flag to verify the private default. Browser checks complement a manual screen reader review.
 
 ## Content and downloads
 

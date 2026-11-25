@@ -46,7 +46,9 @@ test.describe("enabled engineering case studies", () => {
     const collection = page.getByRole("region", { name: "All case studies" });
     const search = collection.getByRole("searchbox");
     await expect(search).toHaveValue("Papa Parse");
-    await expect(collection.getByRole("status")).toHaveText("1 case study");
+    await expect(collection.getByRole("status")).toHaveText(
+      "1 case study in Performance matching “Papa Parse”",
+    );
     await expect(
       collection.getByRole("button", { name: "Performance", exact: true }),
     ).toHaveAttribute("aria-pressed", "true");
@@ -109,7 +111,7 @@ test.describe("enabled engineering case studies", () => {
       await page.goto(route);
       for (const theme of ["light", "dark"]) {
         if ((await page.locator("html").getAttribute("data-theme")) !== theme) {
-          await page.getByRole("button", { name: "Toggle theme" }).click();
+          await page.getByRole("button", { name: "Dark theme" }).click();
         }
         await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
         for (const width of widths) {
@@ -142,7 +144,7 @@ test.describe("enabled engineering case studies", () => {
         height: info.project.name === "mobile" ? 840 : 1080,
       });
       if (info.project.name === "mobile") {
-        await page.getByRole("button", { name: "Toggle theme" }).click();
+        await page.getByRole("button", { name: "Dark theme" }).click();
       }
       await page.goto(route);
       await expect(page.locator(".site-header")).toHaveCount(1);

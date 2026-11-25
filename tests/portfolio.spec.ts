@@ -73,7 +73,7 @@ test("palette supports search, empty state, Escape and focus restoration", async
 }) => {
   await page.goto("/");
   const opener = isMobile
-    ? page.getByRole("button", { name: "Toggle theme" })
+    ? page.getByRole("button", { name: "Dark theme" })
     : page.getByRole("button", { name: "Open command palette" });
   await opener.focus();
   if (isMobile) await page.keyboard.press("Control+k");
@@ -100,7 +100,7 @@ test("persists theme and offers an accessible skip link", async ({ page }) => {
   await expect(page.getByRole("main")).toBeFocused();
   const before = await page.locator("html").getAttribute("data-theme");
   const expected = before === "dark" ? "light" : "dark";
-  await page.getByRole("button", { name: "Toggle theme" }).click();
+  await page.getByRole("button", { name: "Dark theme" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", expected);
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", expected);
@@ -188,7 +188,7 @@ test("lays out all public templates in both themes across nine widths", async ({
     await page.goto(path);
     for (const theme of ["dark", "light"]) {
       if ((await page.locator("html").getAttribute("data-theme")) !== theme)
-        await page.getByRole("button", { name: "Toggle theme" }).click();
+        await page.getByRole("button", { name: "Dark theme" }).click();
       await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
       for (const width of widths) {
         await page.setViewportSize({ width, height: 900 });
@@ -213,7 +213,7 @@ test("lays out all public templates in both themes across nine widths", async ({
       height: 940,
     });
     if (info.project.name === "desktop")
-      await page.getByRole("button", { name: "Toggle theme" }).click();
+      await page.getByRole("button", { name: "Dark theme" }).click();
     await page.goto(path);
     await page.screenshot({
       path: info.outputPath(
