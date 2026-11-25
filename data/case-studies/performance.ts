@@ -13,7 +13,6 @@ export const csv: CaseStudy = {
   category: "Performance & Scalability",
   filter: "performance",
   technologies: ["Papa Parse", "FileReader", "TypeScript", "Presigned uploads"],
-  minutes: 6,
   featured: "primary",
   order: 1,
   contributions: [
@@ -25,18 +24,30 @@ export const csv: CaseStudy = {
   metrics: [
     {
       value: "40 → 10",
+      unit: "reads",
+      method: "FileReader call counts at 200,000 synthetic records",
+      verification: "local-benchmark",
+      release: "case-studies",
       label: "File reads",
       scope: "Local benchmark",
       context: "200,000 synthetic records, a 75% reduction.",
     },
     {
       value: "14.3%",
+      unit: "percent",
+      method: "Local median processing time at 200,000 synthetic records",
+      verification: "local-benchmark",
+      release: "case-studies",
       label: "Lower median processing time",
       scope: "Local benchmark",
       context: "200,000 synthetic records, from 213.3 to 182.9 ms.",
     },
     {
       value: "33.1%",
+      unit: "percent",
+      method: "Local median processing time at one million synthetic records",
+      verification: "local-benchmark",
+      release: "case-studies",
       label: "Lower median processing time",
       scope: "Local benchmark",
       context: "Approximately, at one million synthetic records.",
@@ -164,7 +175,6 @@ export const frontendPerformance: CaseStudy = {
     "Lighthouse CI",
     "Web Vitals",
   ],
-  minutes: 5,
   order: 8,
   contributions: [
     "My focus was on frontend loading boundaries and the instrumentation and build checks used to investigate regressions. The results below apply to a local application build.",

@@ -1,44 +1,18 @@
 .cs {
-  --cs-accent: color-mix(in srgb, var(--green) 68%, var(--text));
+  --cs-accent: var(--accent);
   --cs-surface: var(--bg-soft);
   --cs-border: var(--line);
-  --cs-radius: 10px;
-  --cs-gutter: clamp(16px, 3.2vw, 32px);
-  --cs-nav-offset: 120px;
-}
-
-html[data-theme="light"] .cs {
-  --cs-accent: color-mix(in srgb, var(--green) 52%, var(--text));
-}
-
-.cs :focus-visible {
-  outline-color: var(--cs-accent);
-}
-
-.cs-site {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  --cs-radius: var(--radius);
+  --cs-nav-offset: var(--anchor-offset);
 }
 
 .cs-wrap {
-  width: min(1180px, calc(100% - var(--cs-gutter) * 2));
+  width: min(var(--frame), calc(100% - var(--gutter) * 2));
   margin-inline: auto;
 }
 
-.cs-site main {
-  flex: 1;
-  padding-top: 104px;
-}
-
-.cs-site .nav {
-  background: color-mix(in srgb, var(--bg-soft) 96%, transparent);
-  box-shadow: 0 8px 22px color-mix(in srgb, var(--bg) 55%, transparent);
-}
-
-.cs-site .desktop-nav a[aria-current],
-.cs-site .dialog-nav a[aria-current] {
-  color: var(--cs-accent);
+.cs-main {
+  padding-top: clamp(18px, 3.4vw, 36px);
 }
 
 .cs h1,
@@ -333,7 +307,6 @@ html[data-theme="light"] .cs {
 
 .cs-collection {
   margin-top: clamp(35px, 5.4vw, 64px);
-  scroll-margin-top: var(--cs-nav-offset);
 }
 
 .cs-filter {
@@ -515,44 +488,6 @@ html[data-theme="light"] .cs {
   color: var(--cs-accent);
 }
 
-.cs-section-heading {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 0 14px;
-  margin-bottom: 12px;
-}
-.cs-section-heading h2 {
-  margin: 0;
-}
-.cs-home .cs-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-.cs-footer {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 0 22px;
-  margin-top: clamp(38px, 6vw, 72px);
-  border-top: 1px solid var(--cs-border);
-  padding: 10px 0 14px;
-  color: var(--muted);
-  font-size: 0.875rem;
-}
-.cs-footer nav {
-  display: flex;
-  gap: 18px;
-}
-.cs-footer a {
-  display: inline-flex;
-  min-height: 44px;
-  align-items: center;
-}
-.cs-footer a:hover {
-  color: var(--cs-accent);
-}
-
 .cs-article-header {
   padding: clamp(27px, 4vw, 48px) 0 30px;
   max-width: 800px;
@@ -636,9 +571,6 @@ html[data-theme="light"] .cs {
   background: var(--cs-accent);
 }
 
-.cs-reading-body [id] {
-  scroll-margin-top: var(--cs-nav-offset);
-}
 .cs-outcomes {
   padding: 20px clamp(16px, 3vw, 27px);
   border: 1px solid var(--cs-border);
@@ -918,24 +850,6 @@ html[data-theme="light"] .cs {
   border: 1px solid var(--cs-border);
   border-radius: 6px;
 }
-.cs-demo select {
-  appearance: none;
-  padding-right: 25px;
-  background-image:
-    linear-gradient(45deg, transparent 50%, var(--muted) 51%),
-    linear-gradient(135deg, var(--muted) 50%, transparent 51%);
-  background-position:
-    right 13px center,
-    right 8px center;
-  background-size: 5px 5px;
-  background-repeat: no-repeat;
-}
-.cs-demo :is(select, input, textarea) {
-  color-scheme: dark;
-}
-html[data-theme="light"] .cs-demo :is(select, input, textarea) {
-  color-scheme: light;
-}
 .cs-demo .cs-demo-check {
   grid-auto-flow: column;
   align-items: center;
@@ -1049,15 +963,9 @@ html[data-theme="light"] .cs-demo :is(select, input, textarea) {
     border-inline-start: 0;
     border-top: 1px solid var(--cs-border);
   }
-  .cs-home .cs-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 @media (max-width: 640px) {
-  .cs-site main {
-    padding-top: 89px;
-  }
   .cs-metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 13px 0;
@@ -1109,5 +1017,34 @@ html[data-theme="light"] .cs-demo :is(select, input, textarea) {
   .cs-download {
     align-items: start;
     flex-direction: column;
+  }
+}
+
+@media (forced-colors: active) {
+  .cs :focus-visible,
+  .cs-search:focus-within,
+  .cs-card-link:focus-visible::after {
+    outline-color: Highlight;
+  }
+
+  .cs-filter-categories button[aria-pressed="true"],
+  .cs-button[aria-pressed="true"],
+  .cs-toc a[aria-current] {
+    border: 1px solid Highlight;
+  }
+
+  .cs-button:not(:disabled),
+  .cs-search {
+    border-color: ButtonText;
+  }
+
+  .cs-bar-track span,
+  .cs-chart-row:last-child .cs-bar-track span {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+
+  .cs-chart-row:last-child .cs-bar-track span {
+    background: Highlight;
   }
 }

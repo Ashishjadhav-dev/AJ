@@ -1,10 +1,17 @@
 import Link from "next/link";
 import { Download } from "lucide-react";
-import { caseStudies, toCard } from "@/data/case-studies";
+import {
+  caseStudies,
+  featuredContext,
+  getCaseStudy,
+  readingMinutes,
+} from "@/data/case-studies";
 import type { Metric } from "@/data/case-studies/schema";
-import { profile } from "@/data/portfolio";
-import { CaseStudyGrid, TechnologyTags } from "./CaseStudyCard";
-import { CaseStudyBenchmarkChart } from "./CaseStudyFigures";
+import { TechnologyTags } from "./CaseStudyCard";
+import {
+  CaseStudyArchitectureDiagram,
+  CaseStudyBenchmarkChart,
+} from "./CaseStudyFigures";
 import "@/app/case-studies/case-studies.css";
 
 export function CaseStudyBreadcrumb({ current }: { current?: string }) {
@@ -116,7 +123,7 @@ export function FeaturedCaseStudy() {
       <div className="cs-feature-copy">
         <p className="cs-eyebrow">Featured case study</p>
         <p className="cs-meta">
-          {study.category} · {study.minutes} min read
+          {study.category} · {readingMinutes(study)} min read
         </p>
         <h2 id="featured-study">{study.title}</h2>
         <p className="cs-feature-description">
@@ -150,32 +157,75 @@ export function FeaturedCaseStudy() {
 }
 
 export function FeaturedCaseStudies() {
+  const selected = Object.entries(featuredContext).flatMap(
+    ([slug, context]) => {
+      const study = getCaseStudy(slug);
+      return study ? [{ study, context }] : [];
+    },
+  );
   return (
     <section
-      className="section cs-home cs"
+      className="site-wrap site-section cs"
       aria-labelledby="featured-engineering"
     >
-      <div className="cs-section-heading">
-        <h2 id="featured-engineering">Featured Engineering Case Studies</h2>
-        <Link className="cs-text-link" href="/case-studies">
+      <div className="section-intro section-intro-link">
+        <div>
+          <h2 id="featured-engineering">Selected Engineering Case Studies</h2>
+          <p>
+            A deeper look at the architecture, implementation decisions and
+            measurable outcomes behind complex frontend systems.
+          </p>
+        </div>
+        <Link href="/case-studies" className="site-link">
           View All Case Studies
         </Link>
       </div>
-      <CaseStudyGrid
-        studies={caseStudies.filter(({ featured }) => featured).map(toCard)}
-      />
+      <div className="featured-editorial-list">
+        {selected.map(({ study, context }) => {
+          const diagram = study.sections.find(
+            ({ diagrams }) => diagrams?.length,
+          )?.diagrams?.[0];
+          const bench = study.benchmark?.at(-1);
+          return (
+            <article className="featured-editorial-row" key={study.slug}>
+              <div className="featured-editorial-copy">
+                <p className="site-meta">
+                  {study.category} · {readingMinutes(study)} min read
+                </p>
+                <h3>{study.title}</h3>
+                <p>{context.problem}</p>
+                <p>{context.contribution}</p>
+                <p className="featured-outcome">{study.outcome}</p>
+                <ul className="site-tags" aria-label="Technologies">
+                  {study.technologies.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+                <Link
+                  href={`/case-studies/${study.slug}`}
+                  className="site-link"
+                >
+                  Read case study
+                  <span className="sr-only"> on {study.title}</span>
+                </Link>
+              </div>
+              <div className="featured-editorial-visual">
+                {bench ? (
+                  <CaseStudyBenchmarkChart
+                    title="Local benchmark"
+                    caption={`${bench[0].toLocaleString("en-US")} synthetic records`}
+                    previous={bench[1]}
+                    optimized={bench[2]}
+                    unit="ms"
+                  />
+                ) : (
+                  diagram && <CaseStudyArchitectureDiagram diagram={diagram} />
+                )}
+              </div>
+            </article>
+          );
+        })}
+      </div>
     </section>
-  );
-}
-
-export function CaseStudyFooter() {
-  return (
-    <footer className="cs-wrap cs-footer">
-      <Link href="/">{profile.name}</Link>
-      <nav aria-label="Footer navigation">
-        <Link href="/#projects">Projects</Link>
-        <Link href="/#contact">Contact</Link>
-      </nav>
-    </footer>
   );
 }

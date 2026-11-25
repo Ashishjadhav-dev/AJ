@@ -2,43 +2,70 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Command, Menu, Moon, Sun, X } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { Command, Download, Menu, Moon, Sun, X } from "lucide-react";
 import { Dialog } from "@/components/Dialog";
 import { useTheme } from "@/components/Providers";
-import { navItems, profile } from "@/data/portfolio";
+
+const homeSections = [
+  "home",
+  "experience",
+  "projects",
+  "skills",
+  "about",
+  "contact",
+];
 
 export function PortfolioNavigation({
   caseStudies,
-  insideCaseStudies = false,
+  resume,
 }: {
   caseStudies: boolean;
-  insideCaseStudies?: boolean;
+  resume: string;
 }) {
-  const { theme, changeTheme } = useTheme();
+  const pathname = usePathname();
+  const { theme, toggleTheme } = useTheme();
   const [query, setQuery] = useState("");
   const [activeSection, setActiveSection] = useState("home");
   const [open, setOpen] = useState<"menu" | "palette" | null>(null);
 
   useEffect(() => {
-    if (insideCaseStudies) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) setActiveSection(entry.target.id);
-        }
-      },
-      { rootMargin: "-15% 0px -65% 0px" },
-    );
-    for (const item of navItems) {
-      const section = document.getElementById(item.toLowerCase());
-      if (section) observer.observe(section);
-    }
-    return () => observer.disconnect();
-  }, [insideCaseStudies]);
+    if (pathname !== "/") return;
+    const sections = homeSections.flatMap((id) => {
+      const section = document.getElementById(id);
+      return section ? [section] : [];
+    });
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const boundary = Math.max(140, window.innerHeight * 0.28);
+      const current = sections
+        .filter((section) => section.getBoundingClientRect().top <= boundary)
+        .at(-1);
+      setActiveSection(current?.id ?? "home");
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    schedule();
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+  }, [pathname]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+      if (
+        (event.metaKey || event.ctrlKey) &&
+        event.key.toLowerCase() === "k" &&
+        !document.querySelector(
+          "dialog[open]:not(.command-palette):not(.mobile-dialog)",
+        )
+      ) {
         event.preventDefault();
         setQuery("");
         setOpen((value) => (value === "palette" ? null : "palette"));
@@ -48,34 +75,37 @@ export function PortfolioNavigation({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
-  const labels = caseStudies
-    ? [
-        "Home",
-        "About",
-        "Experience",
-        "Projects",
-        "Case Studies",
-        "Blog",
-        "Contact",
-      ]
-    : navItems;
-  const links = labels.map((label) => {
-    const key = label.toLowerCase();
-    const isCaseStudies = label === "Case Studies";
-    const href = isCaseStudies
-      ? "/case-studies"
-      : `${insideCaseStudies ? "/" : ""}#${key}`;
-    const current = insideCaseStudies
-      ? isCaseStudies
-        ? "location"
-        : undefined
-      : key === activeSection
-        ? "location"
-        : undefined;
-    return { label, key, href, current } as const;
-  });
-  const matches = links.filter(({ key }) =>
-    key.includes(query.trim().toLowerCase()),
+  const links = [
+    { label: "Home", key: "home", href: pathname === "/" ? "#home" : "/" },
+    { label: "Experience", key: "experience", href: "/#experience" },
+    ...(caseStudies
+      ? [{ label: "Case Studies", key: "case-studies", href: "/case-studies" }]
+      : []),
+    { label: "Projects", key: "projects", href: "/projects" },
+    { label: "Skills", key: "skills", href: "/#skills" },
+    { label: "About", key: "about", href: "/#about" },
+    { label: "Contact", key: "contact", href: "/#contact" },
+  ].map(
+    (link) =>
+      ({
+        ...link,
+        current:
+          pathname === "/"
+            ? activeSection === link.key
+              ? "location"
+              : undefined
+            : link.href.startsWith("/") &&
+                link.href.length > 1 &&
+                (pathname === link.href || pathname.startsWith(`${link.href}/`))
+              ? "location"
+              : undefined,
+      }) as const,
+  );
+  const matches = [
+    ...links,
+    { label: "Resume", key: "resume", href: "/resume", current: undefined },
+  ].filter(({ label }) =>
+    label.toLowerCase().includes(query.trim().toLowerCase()),
   );
   const close = () => {
     setOpen(null);
@@ -84,63 +114,62 @@ export function PortfolioNavigation({
 
   return (
     <>
-      <a
-        className="skip-link"
-        href={insideCaseStudies ? "#main-content" : "#home"}
-      >
+      <a className="skip-link" href="#main-content">
         Skip to content
       </a>
-      <header className="nav-wrap">
-        <div className="nav panel">
-          <Link
-            className="brand"
-            href={insideCaseStudies ? "/" : "#home"}
-            aria-label="Go home"
-          >
-            AJ
+      <header className="site-header">
+        <div className="site-wrap site-header-inner">
+          <Link className="brand" href="/" aria-label="Ashish S. Jadhav, home">
+            AJ<span aria-hidden>.</span>
           </Link>
           <nav className="desktop-nav" aria-label="Primary navigation">
-            {links.map(({ label, href, current }, index) => (
+            {links.map(({ label, href, current }) => (
               <Link key={href} href={href} aria-current={current}>
-                <span aria-hidden="true">0{index + 1}.</span> {label}
+                {label}
               </Link>
             ))}
           </nav>
           <div className="nav-actions">
-            <Link
-              className="availability"
-              href={insideCaseStudies ? "/#contact" : "#contact"}
-            >
-              <span className="status-dot" />{" "}
-              {profile.available ? "Available" : "Let’s connect"}
-            </Link>
             <button
-              className="icon-btn"
+              className="icon-btn palette-opener"
+              type="button"
               onClick={() => setOpen("palette")}
               aria-label="Open command palette"
+              aria-haspopup="dialog"
             >
-              <Command size={17} />
+              <Command size={16} aria-hidden />
             </button>
             <button
               className="icon-btn"
-              onClick={() => changeTheme(theme === "dark" ? "light" : "dark")}
-              aria-label="Toggle theme"
+              type="button"
+              onClick={toggleTheme}
+              aria-label="Dark theme"
+              aria-pressed={theme === undefined ? undefined : theme === "dark"}
             >
-              {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
+              <Sun className="theme-icon-sun" size={17} aria-hidden />
+              <Moon className="theme-icon-moon" size={17} aria-hidden />
             </button>
+            <a
+              className="site-button nav-resume"
+              href={resume}
+              download
+              aria-label="Download Resume"
+            >
+              <Download size={15} aria-hidden /> Resume
+            </a>
             <button
               className="icon-btn mobile-only"
+              type="button"
               onClick={() => setOpen("menu")}
               aria-label="Open menu"
               aria-haspopup="dialog"
               aria-expanded={open === "menu"}
             >
-              <Menu size={18} />
+              <Menu size={19} aria-hidden />
             </button>
           </div>
         </div>
       </header>
-
       <Dialog
         open={open === "menu"}
         onClose={close}
@@ -148,13 +177,13 @@ export function PortfolioNavigation({
         className="mobile-dialog"
       >
         <div className="mobile-menu-head">
-          <span className="brand">AJ</span>
+          <strong>Navigation</strong>
           <button
             className="icon-btn"
             onClick={close}
             aria-label="Close navigation"
           >
-            <X size={18} />
+            <X size={18} aria-hidden />
           </button>
         </div>
         <nav className="dialog-nav" aria-label="Mobile navigation">
@@ -163,6 +192,9 @@ export function PortfolioNavigation({
               {label}
             </Link>
           ))}
+          <Link href="/resume" onClick={close}>
+            View resume
+          </Link>
         </nav>
       </Dialog>
       <Dialog
@@ -172,7 +204,7 @@ export function PortfolioNavigation({
         className="command-palette"
       >
         <div className="palette-search">
-          <Command size={16} />
+          <Command size={16} aria-hidden />
           <input
             autoFocus
             aria-label="Search sections"
@@ -185,17 +217,17 @@ export function PortfolioNavigation({
             onClick={close}
             aria-label="Close command palette"
           >
-            <X size={16} />
+            <X size={16} aria-hidden />
           </button>
         </div>
         <div className="dialog-nav">
-          {matches.map(({ key, href, current }) => (
+          {matches.map(({ label, href, current }) => (
             <Link key={href} href={href} aria-current={current} onClick={close}>
-              /{key} <ArrowRight size={14} />
+              {label}
             </Link>
           ))}
         </div>
-        {matches.length === 0 && (
+        {!matches.length && (
           <p className="empty-state" role="status">
             No sections found. Try “projects” or “contact”.
           </p>

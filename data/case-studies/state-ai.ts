@@ -19,7 +19,6 @@ export const caching: CaseStudy = {
     "React Context",
     "TypeScript",
   ],
-  minutes: 5,
   featured: "home",
   order: 5,
   contributions: [
@@ -133,7 +132,6 @@ export const aiEditors: CaseStudy = {
   category: "AI Integration",
   filter: "ai",
   technologies: ["React", "TypeScript", "AI API", "SMS & WhatsApp"],
-  minutes: 4,
   order: 7,
   contributions: [
     "I contributed to SMS and WhatsApp frontend generation workflows, shared editor controls, and integration of campaign AI deliverability summaries. My work was API integration and editor behavior. Model training, inference infrastructure, and agent development were outside its scope.",

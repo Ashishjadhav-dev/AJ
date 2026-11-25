@@ -9,8 +9,16 @@ test("release flag governs discovery, pages and supporting assets", async ({
 }) => {
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: "Featured Engineering Case Studies" }),
+    page.getByRole("heading", { name: "Selected Engineering Case Studies" }),
   ).toHaveCount(enabled ? 1 : 0);
+  if (!enabled) {
+    await expect(
+      page.getByText("Synthetic CSV records benchmarked"),
+    ).toHaveCount(0);
+    expect((await request.get("/case-studies/portfolio.pdf")).status()).toBe(
+      404,
+    );
+  }
   const sitemap = await request.get("/sitemap.xml");
   expect(await sitemap.text()).toEqual(
     enabled
@@ -38,7 +46,9 @@ test.describe("enabled engineering case studies", () => {
     const collection = page.getByRole("region", { name: "All case studies" });
     const search = collection.getByRole("searchbox");
     await expect(search).toHaveValue("Papa Parse");
-    await expect(collection.getByRole("status")).toHaveText("1 case study");
+    await expect(collection.getByRole("status")).toHaveText(
+      "1 case study in Performance matching “Papa Parse”",
+    );
     await expect(
       collection.getByRole("button", { name: "Performance", exact: true }),
     ).toHaveAttribute("aria-pressed", "true");
@@ -86,17 +96,22 @@ test.describe("enabled engineering case studies", () => {
   test("keeps navigation, content and tables within the viewport in both themes", async ({
     page,
   }, info) => {
+    test.slow();
     const errors: string[] = [];
     page.on("pageerror", (error) => errors.push(error.message));
     page.on("console", (message) => {
       if (message.type() === "error") errors.push(message.text());
     });
     const widths = [320, 375, 390, 430, 768, 1024, 1280, 1440, 1920];
-    for (const route of ["/case-studies", "/case-studies/csv-performance"]) {
+    const routes = [
+      "/case-studies",
+      ...caseStudies.map(({ slug }) => `/case-studies/${slug}`),
+    ];
+    for (const route of routes) {
       await page.goto(route);
       for (const theme of ["light", "dark"]) {
         if ((await page.locator("html").getAttribute("data-theme")) !== theme) {
-          await page.getByRole("button", { name: "Toggle theme" }).click();
+          await page.getByRole("button", { name: "Dark theme" }).click();
         }
         await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
         for (const width of widths) {
@@ -119,15 +134,20 @@ test.describe("enabled engineering case studies", () => {
             .toBe(true);
         }
       }
+      if (
+        route !== "/case-studies" &&
+        route !== "/case-studies/csv-performance"
+      )
+        continue;
       await page.setViewportSize({
         width: info.project.name === "mobile" ? 390 : 1440,
         height: info.project.name === "mobile" ? 840 : 1080,
       });
       if (info.project.name === "mobile") {
-        await page.getByRole("button", { name: "Toggle theme" }).click();
+        await page.getByRole("button", { name: "Dark theme" }).click();
       }
       await page.goto(route);
-      await expect(page.locator(".nav-wrap")).toHaveCount(1);
+      await expect(page.locator(".site-header")).toHaveCount(1);
       await expect(page.locator("html")).toHaveAttribute(
         "data-theme",
         /dark|light/,

@@ -1,91 +1,100 @@
-import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowRight } from "lucide-react";
-import { profile, projects } from "@/data/portfolio";
+import { ArrowUpRight } from "lucide-react";
+import { profile } from "@/data/portfolio";
+import { projects } from "@/data/projects";
+import { siteMetadata } from "@/lib/site-seo";
+import { PageBreadcrumb } from "@/components/PageBreadcrumb";
+import { CaseStudyArchitectureDiagram } from "@/components/case-studies/CaseStudyFigures";
+import { CaseStudyReading } from "@/components/case-studies/CaseStudyReading";
+import { ProjectScreenshot } from "@/components/Projects";
+import "@/app/case-studies/case-studies.css";
 
 type Props = { params: Promise<{ slug: string }> };
+
 export function generateStaticParams() {
   return projects.map(({ slug }) => ({ slug }));
 }
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+
+export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const project = projects.find((item) => item.slug === slug);
   return project
-    ? {
-        title: `${project.name} — ${profile.name}`,
-        description: project.description,
-      }
+    ? siteMetadata(
+        `${project.name} — ${profile.name}`,
+        project.description,
+        `/projects/${slug}`,
+      )
     : {};
 }
+
 export default async function ProjectPage({ params }: Props) {
   const { slug } = await params;
   const project = projects.find((item) => item.slug === slug);
   if (!project) notFound();
   return (
-    <main className="section detail-page">
-      <Link className="text-link" href="/#projects">
-        <ArrowLeft size={16} /> Back to projects
-      </Link>
-      <article className={`panel detail-card ${project.accent}`}>
-        <div className="eyebrow">
-          {"// projects/"}
-          {project.slug}
-        </div>
-        <h1>{project.name}</h1>
-        <h2>{project.subtitle}</h2>
-        <p className="section-copy">{project.description}</p>
-        <div className="project-external-links">
-          {project.liveUrl && (
+    <main id="main-content" tabIndex={-1} className="site-wrap standard-page">
+      <PageBreadcrumb
+        entries={[
+          { title: "Home", href: "/" },
+          { title: "Projects", href: "/projects" },
+          { title: project.name, href: `/projects/${slug}` },
+        ]}
+      />
+      <article className="cs project-article">
+        <header className="page-heading">
+          <p className="site-kicker">{project.status}</p>
+          <h1>{project.name}</h1>
+          <p className="project-detail-subtitle">{project.subtitle}</p>
+          <p>{project.description}</p>
+          <div className="site-actions">
             <a
-              className="secondary-btn"
+              className="site-button site-button-primary"
               href={project.liveUrl}
-              target="_blank"
-              rel="noopener noreferrer"
             >
-              Live project <ArrowRight size={16} />
+              Live application <ArrowUpRight size={16} aria-hidden />
             </a>
-          )}
-          {project.sourceUrl && (
-            <a
-              className="secondary-btn"
-              href={project.sourceUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Source code <ArrowRight size={16} />
-            </a>
-          )}
-        </div>
-        <h3>Built with</h3>
-        <div className="pill-row">
-          {project.stack.map((item) => (
-            <span className="pill" key={item}>
-              {item}
-            </span>
-          ))}
-        </div>
-        <a
-          className="primary-btn"
-          href={`mailto:${profile.email}?subject=${encodeURIComponent(`Tell me about ${project.name}`)}`}
+            {project.sourceUrl && (
+              <a className="site-button" href={project.sourceUrl}>
+                Public repository <ArrowUpRight size={16} aria-hidden />
+              </a>
+            )}
+          </div>
+          <ul className="site-tags" aria-label="Project technologies">
+            {project.stack.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </header>
+        <CaseStudyReading
+          sections={project.sections.map(({ id, title }) => ({ id, title }))}
         >
-          Discuss this project <ArrowRight size={16} />
-        </a>
-      </article>
-      <nav className="related-projects" aria-label="More projects">
-        <h2>More projects</h2>
-        {projects
-          .filter((item) => item.slug !== slug)
-          .map((item) => (
-            <Link
-              className="secondary-btn"
-              key={item.slug}
-              href={`/projects/${item.slug}`}
-            >
-              {item.name} <ArrowRight size={16} />
-            </Link>
+          {project.screenshot && (
+            <ProjectScreenshot screenshot={project.screenshot} />
+          )}
+          {project.sections.map(({ id, title, paragraphs, items }) => (
+            <section className="cs-article-section" id={id} key={id}>
+              <h2>{title}</h2>
+              {paragraphs?.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+              {items && (
+                <ul>
+                  {items.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              )}
+              {id === "architecture" &&
+                project.diagrams.map((diagram) => (
+                  <CaseStudyArchitectureDiagram
+                    key={diagram.title}
+                    diagram={diagram}
+                  />
+                ))}
+            </section>
           ))}
-      </nav>
+        </CaseStudyReading>
+      </article>
     </main>
   );
 }

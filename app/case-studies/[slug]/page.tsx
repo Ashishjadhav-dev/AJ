@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { CaseStudyArticle } from "@/components/case-studies/CaseStudyArticle";
 import { CaseStudyBreadcrumb } from "@/components/case-studies/CaseStudyOverview";
-import { caseStudies, getCaseStudy } from "@/data/case-studies";
+import { caseStudies, getCaseStudy, readingMinutes } from "@/data/case-studies";
 import { profile } from "@/data/portfolio";
 import { caseStudiesEnabled, portfolioSiteUrl } from "@/lib/case-study-release";
 import {
@@ -37,7 +37,7 @@ export default async function CaseStudyPage({ params }: Props) {
     author: { "@type": "Person", name: profile.name, url: portfolioSiteUrl },
     inLanguage: "en",
     about: study.technologies,
-    timeRequired: `PT${study.minutes}M`,
+    timeRequired: `PT${readingMinutes(study)}M`,
   };
   return (
     <>

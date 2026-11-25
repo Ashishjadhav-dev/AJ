@@ -19,7 +19,6 @@ export const testing: CaseStudy = {
     "axe-core",
     "GitHub Actions",
   ],
-  minutes: 4,
   order: 9,
   contributions: [
     "I contributed regression coverage for segmentation hydration and request deduplication, and directly contributed command palette and sidebar keyboard interaction tests. The test suite and its infrastructure were shared.",
@@ -133,7 +132,6 @@ export const designSystem: CaseStudy = {
   category: "UI/UX Engineering",
   filter: "accessibility",
   technologies: ["Tailwind CSS", "Material UI", "React", "axe-core"],
-  minutes: 4,
   order: 10,
   contributions: [
     "I contributed to reusable frontend interfaces and directly contributed command palette and sidebar keyboard interaction tests. The component inventory reflects shared repository work.",

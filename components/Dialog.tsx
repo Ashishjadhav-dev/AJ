@@ -26,7 +26,7 @@ export function Dialog({
     return () => {
       dialog.close();
       document.body.style.overflow = overflow;
-      previous?.focus();
+      if (previous?.isConnected) previous.focus({ preventScroll: true });
     };
   }, [open]);
 

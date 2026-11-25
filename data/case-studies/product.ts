@@ -13,7 +13,6 @@ export const segmentation: CaseStudy = {
   category: "Complex Product Engineering",
   filter: "product",
   technologies: ["React", "TypeScript", "Dynamic forms", "Vitest"],
-  minutes: 5,
   order: 4,
   contributions: [
     "I worked on payload validation, nested condition handling, and hydration of saved rules, including serialized conditions. I added regression coverage for representative round-trip and hydration failures.",
@@ -127,7 +126,6 @@ export const liveFeed: CaseStudy = {
   category: "Product Engineering",
   filter: "product",
   technologies: ["React", "TypeScript", "HTTP", "Cursor pagination"],
-  minutes: 4,
   order: 6,
   contributions: [
     "My frontend contributions covered transactional event and account workflows, including event filtering, paging and export, as well as related webhook management interfaces.",

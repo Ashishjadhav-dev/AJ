@@ -7,43 +7,60 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { MotionConfig } from "framer-motion";
 
 type Theme = "dark" | "light";
+
 const ThemeContext = createContext<{
-  theme: Theme;
-  changeTheme: (value: Theme) => void;
-}>({ theme: "dark", changeTheme: () => {} });
+  theme?: Theme;
+  toggleTheme: () => void;
+}>({ toggleTheme: () => {} });
 
 export function Providers({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("dark");
-  useEffect(() => {
-    let initial: Theme = window.matchMedia("(prefers-color-scheme: light)")
-      .matches
-      ? "light"
-      : "dark";
-    try {
-      const saved = localStorage.getItem("portfolio-theme");
-      if (saved === "light" || saved === "dark") initial = saved;
-    } catch {
-      /* The system preference is used when storage is unavailable. */
-    }
-    setTheme(initial);
-  }, []);
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-  }, [theme]);
-  const changeTheme = (value: Theme) => {
-    setTheme(value);
-    try {
-      localStorage.setItem("portfolio-theme", value);
-    } catch {
-      /* The current theme still works. */
-    }
+  const [theme, setTheme] = useState<Theme>();
+  const applyTheme = (next: Theme) => {
+    document.documentElement.dataset.theme = next;
+    setTheme(next);
   };
+
+  useEffect(() => {
+    const preference = window.matchMedia("(prefers-color-scheme: dark)");
+    const update = () => {
+      let saved = null;
+      try {
+        saved = localStorage.getItem("portfolio-theme");
+      } catch {}
+      applyTheme(
+        saved === "light" || saved === "dark"
+          ? saved
+          : preference.matches
+            ? "dark"
+            : "light",
+      );
+    };
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === "portfolio-theme" || event.key === null) update();
+    };
+    update();
+    preference.addEventListener("change", update);
+    window.addEventListener("storage", onStorage);
+    return () => {
+      preference.removeEventListener("change", update);
+      window.removeEventListener("storage", onStorage);
+    };
+  }, []);
+
+  const toggleTheme = () => {
+    const next =
+      document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    applyTheme(next);
+    try {
+      localStorage.setItem("portfolio-theme", next);
+    } catch {}
+  };
+
   return (
-    <ThemeContext.Provider value={{ theme, changeTheme }}>
-      <MotionConfig reducedMotion="user">{children}</MotionConfig>
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
     </ThemeContext.Provider>
   );
 }
