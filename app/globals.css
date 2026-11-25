@@ -1211,3 +1211,27 @@ select {
   gap: 10px;
   border-bottom: 1px solid var(--line);
 }
+
+.dialog-nav a[aria-current="location"] {
+  color: var(--text);
+  background: color-mix(in srgb, var(--green) 12%, transparent);
+}
+
+.resume-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 18px;
+  margin-top: 10px;
+}
+
+.resume-links a, .experience-case-link {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+@media (min-width: 981px) and (max-width: 1120px) {
+  .desktop-nav a {
+    padding-inline: 7px;
+  }
+}

@@ -4,11 +4,10 @@ import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 import { Projects } from "@/components/Projects";
 import { scrollToSection } from "@/lib/navigation";
-import { useTheme } from "@/components/Providers";
-import { Dialog } from "@/components/Dialog";
+import Link from "next/link";
+import { PortfolioNavigation } from "@/components/PortfolioNavigation";
 import {
   profile,
-  navItems,
   experience,
   skillGroups,
   articles,
@@ -16,29 +15,19 @@ import {
   stats,
   about,
 } from "@/data/portfolio";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { motion, useScroll, useSpring, useReducedMotion } from "framer-motion";
-import {
-  ArrowRight,
-  Code2,
-  Command,
-  Menu,
-  Moon,
-  Send,
-  Sun,
-  Terminal,
-  X,
-  Zap,
-} from "lucide-react";
+import { ArrowRight, Code2, Send, Terminal, Zap } from "lucide-react";
 
-export default function Portfolio() {
-  const { theme, changeTheme } = useTheme();
+export default function Portfolio({
+  featured,
+  caseStudies = false,
+}: {
+  featured?: ReactNode;
+  caseStudies?: boolean;
+}) {
   const reducedMotion = useReducedMotion();
-  const [query, setQuery] = useState("");
-  const [activeSection, setActiveSection] = useState("home");
   const [years, setYears] = useState<string | null>(null);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [paletteOpen, setPaletteOpen] = useState(false);
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, {
     stiffness: 130,
@@ -55,33 +44,6 @@ export default function Portfolio() {
         ) / 10
       ).toFixed(1),
     );
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries)
-          if (entry.isIntersecting) setActiveSection(entry.target.id);
-      },
-      { rootMargin: "-15% 0px -65% 0px" },
-    );
-    navItems.forEach((item) => {
-      const section = document.getElementById(item.toLowerCase());
-      if (section) observer.observe(section);
-    });
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
-        event.preventDefault();
-        setPaletteOpen((value) => !value);
-      }
-      if (event.key === "Escape") {
-        setMenuOpen(false);
-        setPaletteOpen(false);
-      }
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
   const [heroWord, setHeroWord] = useState(0);
@@ -102,60 +64,7 @@ export default function Portfolio() {
       <div className="ambient ambient-two" />
       <div className="grid-overlay" />
 
-      <a className="skip-link" href="#home">
-        Skip to content
-      </a>
-      <header className="nav-wrap">
-        <div className="nav panel">
-          <button
-            className="brand"
-            onClick={() => scrollToSection("Home")}
-            aria-label="Go home"
-          >
-            AJ
-          </button>
-          <nav className="desktop-nav" aria-label="Primary navigation">
-            {navItems.map((item, index) => (
-              <a
-                key={item}
-                href={`#${item.toLowerCase()}`}
-                aria-current={
-                  activeSection === item.toLowerCase() ? "location" : undefined
-                }
-              >
-                <span>0{index + 1}.</span> {item}
-              </a>
-            ))}
-          </nav>
-          <div className="nav-actions">
-            <a href="#contact" className="availability">
-              <span className="status-dot" />{" "}
-              {profile.available ? "Available" : "Let’s connect"}
-            </a>
-            <button
-              className="icon-btn"
-              onClick={() => setPaletteOpen(true)}
-              aria-label="Open command palette"
-            >
-              <Command size={17} />
-            </button>
-            <button
-              className="icon-btn"
-              onClick={() => changeTheme(theme === "dark" ? "light" : "dark")}
-              aria-label="Toggle theme"
-            >
-              {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
-            </button>
-            <button
-              className="icon-btn mobile-only"
-              onClick={() => setMenuOpen(true)}
-              aria-label="Open menu"
-            >
-              <Menu size={18} />
-            </button>
-          </div>
-        </div>
-      </header>
+      <PortfolioNavigation caseStudies={caseStudies} />
 
       <section id="home" className="hero section" tabIndex={-1}>
         <div className="hero-copy">
@@ -352,6 +261,7 @@ export default function Portfolio() {
       </section>
 
       <Projects />
+      {featured}
 
       <section id="experience" className="section section-grid experience-grid">
         <div>
@@ -379,8 +289,35 @@ export default function Portfolio() {
                 <h3>{item.role}</h3>
                 <strong>{item.company}</strong>
                 {item.bullets.map((bullet) => (
-                  <p key={bullet}>+ {bullet}</p>
+                  <p key={bullet}>
+                    + {bullet}
+                    {caseStudies && index === 0 && (
+                      <>
+                        {" "}
+                        <Link
+                          className="text-link"
+                          href={
+                            bullet.startsWith("Owned")
+                              ? "/case-studies/multi-tenant-caching"
+                              : "/case-studies/ai-content-editors"
+                          }
+                        >
+                          {bullet.startsWith("Owned")
+                            ? "Data architecture"
+                            : "AI editor integration"}
+                        </Link>
+                      </>
+                    )}
+                  </p>
                 ))}
+                {caseStudies && index === 0 && (
+                  <Link
+                    className="text-link experience-case-link"
+                    href="/case-studies"
+                  >
+                    Explore Engineering Contributions
+                  </Link>
+                )}
               </div>
             </motion.div>
           ))}
@@ -441,90 +378,9 @@ export default function Portfolio() {
         </div>
       </section>
 
-      <Contact />
+      <Contact caseStudies={caseStudies} />
 
       <Footer />
-
-      <Dialog
-        open={menuOpen}
-        onClose={() => setMenuOpen(false)}
-        label="Navigation"
-        className="mobile-dialog"
-      >
-        <div className="mobile-menu-head">
-          <span className="brand">AJ</span>
-          <button
-            className="icon-btn"
-            onClick={() => setMenuOpen(false)}
-            aria-label="Close navigation"
-          >
-            <X size={18} />
-          </button>
-        </div>
-        <nav className="dialog-nav">
-          {navItems.map((item) => (
-            <a
-              key={item}
-              href={`#${item.toLowerCase()}`}
-              onClick={() => setMenuOpen(false)}
-            >
-              {item}
-            </a>
-          ))}
-        </nav>
-      </Dialog>
-      <Dialog
-        open={paletteOpen}
-        onClose={() => {
-          setPaletteOpen(false);
-          setQuery("");
-        }}
-        label="Quick navigation"
-        className="command-palette"
-      >
-        <div className="palette-search">
-          <Command size={16} />
-          <input
-            autoFocus
-            aria-label="Search sections"
-            placeholder="Search sections…"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-          />
-          <button
-            className="icon-btn"
-            onClick={() => setPaletteOpen(false)}
-            aria-label="Close command palette"
-          >
-            <X size={16} />
-          </button>
-        </div>
-        <div className="dialog-nav">
-          {navItems
-            .filter((item) =>
-              item.toLowerCase().includes(query.trim().toLowerCase()),
-            )
-            .map((item) => (
-              <a
-                key={item}
-                href={`#${item.toLowerCase()}`}
-                onClick={() => {
-                  setPaletteOpen(false);
-                  setQuery("");
-                }}
-              >
-                /{item.toLowerCase()} <ArrowRight size={14} />
-              </a>
-            ))}
-        </div>
-        {!navItems.some((item) =>
-          item.toLowerCase().includes(query.trim().toLowerCase()),
-        ) && (
-          <p className="empty-state" role="status">
-            No sections found. Try “projects” or “contact”.
-          </p>
-        )}
-      </Dialog>
     </main>
   );
 }

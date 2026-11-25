@@ -7,8 +7,8 @@ A responsive Next.js portfolio with a terminal/editor visual style, TypeScript a
 Use Node.js 22 or newer.
 
 ```sh
-npm ci
-npm run dev
+pnpm install --frozen-lockfile
+pnpm dev
 ```
 
 Visit http://localhost:3000. For a production check:
@@ -38,7 +38,30 @@ Edit `data/portfolio.ts` to update:
 - `experience`, `skillGroups`, `stats`, `about` and `heroWords`: portfolio content. Experience years are calculated from the career start date.
 - `articles`: title, summary and optional published `url`. Entries without URLs display “Planned article”.
 
-Content is maintained in the repo and takes effect after rebuilding/deploying. There is no CMS or database. The existing project descriptions and career claims were retained; verify those and the impact statistics before publishing. Resume, live project links and published article links are still to be supplied.
+Content is maintained in the repo and takes effect after rebuilding/deploying. There is no CMS or database. The existing project descriptions and career claims were retained; verify those and the impact statistics before publishing. Live project links and published article links are still to be supplied. The resume link uses the PDF in `public/`.
+
+## Engineering case studies
+
+Start a local preview with the release flag enabled.
+
+```sh
+ENGINEERING_CASE_STUDIES_PUBLIC=true pnpm dev
+```
+
+Open `http://localhost:3000/case-studies`. Search and category filters can be shared using the URL, for example `/case-studies?category=performance&q=Papa%20Parse`.
+
+The collection, article pages, sharing image, downloads, homepage links, and sitemap entries are disabled by default. Review and approve all employer-related content before setting `ENGINEERING_CASE_STUDIES_PUBLIC=true` for a public build. Set `PORTFOLIO_SITE_URL` at build time if deploying to a domain other than `https://aj-rho.vercel.app`.
+
+Case studies live in `data/case-studies/`. Document the scope of new measurements and use synthetic fixtures. To enable the complete portfolio download, put the approved PDF at `documents/engineering-portfolio.pdf` before building. This location lets the download route enforce the same release flag. Case-specific PDF URLs are optional and should point only to approved files. The existing resume PDF is supplied as an export. Its authoring source is needed to update the link inside the document.
+
+Run the production and browser checks with Google Chrome installed.
+
+```sh
+pnpm typecheck
+pnpm lint
+ENGINEERING_CASE_STUDIES_PUBLIC=true pnpm build
+ENGINEERING_CASE_STUDIES_PUBLIC=true pnpm test:e2e
+```
 
 ## Interactions
 
@@ -57,7 +80,7 @@ The form validates required fields and opens an encoded `mailto:` draft addresse
 ## Structure
 
 - `app/`: homepage, project routes, metadata, not-found page and styles.
-- `components/Portfolio.tsx`: page composition and navigation.
+- `components/Portfolio.tsx` and `components/PortfolioNavigation.tsx`: homepage composition and shared navigation.
 - `components/Projects.tsx`, `Contact.tsx`, `Footer.tsx`: project explorer, email form and terminal.
 - `components/Providers.tsx`: shared theme and motion preferences.
 - `components/Dialog.tsx`: native accessible modal wrapper.
