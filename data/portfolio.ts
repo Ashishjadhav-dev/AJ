@@ -5,7 +5,7 @@ export const profile = {
   email: "ashishbox13@gmail.com",
   github: "https://github.com/Ashishjadhav-dev",
   linkedin: "https://www.linkedin.com/in/ashish-s-jadhav/",
-  resume: "",
+  resume: "/Ashish_Jadhav_Full_Stack.pdf",
   available: true,
   careerStart: "2023-07-01",
 };
@@ -81,7 +81,7 @@ export const experience = [
     company: "Kasplo Private Limited",
     bullets: [
       "Owned frontend architecture across SSR, caching, state, API layering and real-time flows.",
-      "Built AI-powered automation experiences and improved rendering performance by ~60%.",
+      "Built AI-assisted product experiences and contributed to frontend performance work.",
     ],
   },
   {

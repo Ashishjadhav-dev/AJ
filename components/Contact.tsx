@@ -1,8 +1,9 @@
 "use client";
+import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { ArrowRight, Github, Linkedin, Mail, Send } from "lucide-react";
 import { profile } from "@/data/portfolio";
-export function Contact() {
+export function Contact({ caseStudies = false }: { caseStudies?: boolean }) {
   const [messageState, setMessageState] = useState<"idle" | "draft">("idle");
   const submitContact = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -40,10 +41,26 @@ export function Contact() {
               <Github size={16} /> GitHub
             </a>
           )}
+        </div>
+        <div
+          className="resume-links"
+          aria-label="Resume and engineering work"
+          role="group"
+        >
           {profile.resume && (
-            <a href={profile.resume} target="_blank" rel="noopener noreferrer">
+            <a
+              className="text-link"
+              href={profile.resume}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               View resume <ArrowRight size={16} />
             </a>
+          )}
+          {caseStudies && (
+            <Link className="text-link" href="/case-studies">
+              Engineering Case Studies
+            </Link>
           )}
         </div>
       </div>
